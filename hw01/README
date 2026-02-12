@@ -1,0 +1,175 @@
+/*******************************************************************************
+* CS 15: HW 1 Cheshire ConCATenation
+* README
+* Author: Charlotte Wong
+* Date: 01/26/2026
+*******************************************************************************/
+
+Program Purpose:
+---------------
+    This program's purpose is to implement a character array lists class that 
+    enables flexibility during creation and after the creation of a character 
+    array list. All aspects of content within a character array list may be 
+    modified after its creation in some way. Unexpected uses of the class are 
+    handled through errors that prevent undesired behavior.
+
+Acknowledgments:
+---------------
+    TAs:
+    Eleanor Elkus
+    Kene Olusanya
+    Finn Matthews
+    Andrew Bacigalupi
+    Lindsay Ulrey
+    Yoda Ermias
+
+    Professor Magnano 
+
+Files:
+-----
+    CharArrayList.cpp: implementation of CharArrayList class
+    CharArrayList.h: interface of CharArrayList class
+    Makefile: file to build program
+    README: this file
+    unit_tests.h: unit tests for testing small blocks of code or methods
+
+Compile/run:
+-----------
+
+    Running the command "unit_test" in terminal will run every unit test, which 
+    contains void functions that act as independent "main" functions. Additional
+    void type unit functions can be created and will run with the "unit_test" 
+    command.
+
+    If we want to run one test alone, the command "unit_test -n name_of_test" 
+    will run that specified test (replace name_of_test with the name of the unit
+    test)!
+
+Data Structures and Algorithms:
+---------------
+
+    The primary abstract data type (ADT) used in this program is a list. A list
+    is an ordered collection of elements that supports insertion, removal, and
+    access at arbitrary valid positions. “Ordered” means that each element has a
+    well-defined position (first, second, etc.), but the list is not necessarily
+    sorted. The CharArrayList class provides a concrete implementation of this
+    list ADT for characters.
+
+    The list ADT is implemented using an array list data structure. 
+    Specifically, the CharArrayList stores characters in a dynamically allocated
+    array on the heap, along with variables tracking the current number of 
+    elements (size) and the total allocated storage (capacity). This choice 
+    enables direct, constant-time access to elements by index, which aligns well
+    with the access operations required by the list ADT, such as first(), 
+    last(), and elementAt().
+
+    Array lists were a required data structure for this assignment, but they are
+    also an appropriate choice given the operations supported by CharArrayList.
+    Appending elements to the back of the list is very efficient when sufficient
+    capacity exists, and indexed access is fast and intuitive. These features
+    make array lists well-suited for problems where frequent reads and 
+    occasional writes occur.
+
+    However, array lists also introduce important tradeoffs. Because elements
+    must be stored contiguously, inserting or removing elements from the front
+    or middle of the list requires shifting subsequent elements to maintain
+    correct ordering. These operations therefore take linear time. Additionally,
+    when the array list reaches capacity, a larger array must be allocated and
+    existing elements copied over, which is a costly operation.
+
+    Several key algorithms were implemented to support insertion and removal
+    operations. Insertion functions shift elements forward starting from a given
+    index to make room for a new character, while removal functions shift 
+    elements backward to fill the gap left by a removed character. These 
+    shifting behaviors were modularized into helper functions to avoid code 
+    duplication and improve readability.
+
+Testing:
+-------
+
+    The methods found in this class were testing through the unit_tests system,
+    where after (or even while) a method was written, a small unit test was
+    written & run to ensure expected behavior ensued. The order in which the 
+    functions are written in CharArrayList.cpp is the approximate order in which
+    the tests were written and run in. 
+
+    In unit_tests.h, it was essential to copy and paste statements to be printed
+    in order to properly verify whether I was printing the correct messages, and
+    comparing against truly correct output, and not comparing against my own 
+    incorrect typos. Through assert statements, I was able to catch several bugs
+    with my error messages regarding extra spaces, punctuation and parentheses.
+
+Time Spent: ~20 hours
+----------
+
+Questions:
+---------
+1. There are three categories of operations listed (insertion, removal, and 
+access). Within each category, list the times each operation took and rank the 
+operations from fastest to slowest.
+
+All operations below are run on a separate, randomly generated
+CharArrayList of size 10000.
+
+From the data displayed below, operations ranked from fastest to slowest are:
+1. Access Operation (fastest): last() < first() < elementAt()
+2. Removal Operation: popFromBack() < popFromFront() < popFromFront()
+3. Insertion Operation (slowest): pushAtBack() < insertAt() < pushAtFront()
+
+(data below is not ranked)
+----------------------------------------------------------------------
+INSERTION OPERATION                                 Time (nanoseconds)
+----------------------------------------------------------------------
+pushAtFront 100 times                               5164111
+----------------------------------------------------------------------
+pushAtBack 100 times                                1186
+----------------------------------------------------------------------
+insertAt middle of list 100 times                   2533443
+----------------------------------------------------------------------
+REMOVAL OPERATION                                   Time (nanoseconds)
+----------------------------------------------------------------------
+popFromFront 100 times                              4299803
+----------------------------------------------------------------------
+popFromBack 100 times                               391
+----------------------------------------------------------------------
+removeAt middle of list 100 times                   935959
+----------------------------------------------------------------------
+ACCESS OPERATION                                    Time (nanoseconds)
+----------------------------------------------------------------------
+call first() 100 times                              457
+----------------------------------------------------------------------
+call last() 100 times                               454
+----------------------------------------------------------------------
+call elementAt() for middle of list 100 times       50079
+----------------------------------------------------------------------
+
+2. Discuss these rankings. Why were certain operations so much faster or slower 
+than others? Which operations took approximately the same amount of time? What 
+are the features of array lists that caused these disparities or similarities in
+times?
+
+Access operations (first(), last(), and elementAt()) were the fastest because
+array lists allow direct indexing into the underlying array. These operations
+do not require iteration or shifting of elements, so they run in constant time
+regardless of the size of the list. The similar runtimes of first() and last()
+reflect this constant-time behavior.
+
+Insertion and removal operations were significantly slower than access
+operations because they often require shifting elements to preserve contiguous
+storage. Inserting or removing an element near the front or middle of the list
+requires moving many elements, resulting in linear-time behavior. This explains
+why popFromFront() and removeAt() were much slower than popFromBack().
+
+The popFromBack() operation was the fastest among removal operations because it
+does not require shifting any elements; it simply decreases the size of the
+list. Similarly, pushAtBack() was faster than pushAtFront() or insertAt() 
+because it avoids shifting when sufficient capacity is available.
+
+Insertion operations were generally slower than removal operations due to the
+additional work required to make space for a new element. In some cases,
+insertion may also require allocating a larger array and copying existing
+elements when the list reaches capacity, further increasing runtime. These
+timing differences reflect the fundamental tradeoffs of array lists: fast
+indexed access and appends at the cost of slower insertions and removals at
+arbitrary positions.
+

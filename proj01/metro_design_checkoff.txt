@@ -1,0 +1,120 @@
+Name: Charlotte Wong
+utln: cwong22   
+
+Answer the questions below, and submit your answers under the assignment
+"MetroSim Design Checkoff" on Gradescope. You must sign up for a design
+checkoff slot with a TA to discuss your provided answers (see spec for link).
+
+Unless otherwise specified, your answers below should be *brief*: no more
+than three sentences/question.
+
+1. Are you comfortable with reading from stdin (user input) and a text file 
+in C++? Are you comfortable reading different types (e.g. ints and strings)?
+For this one, don't just answer 'yes' if you are. Write out which data 
+types you will need and which functions you will call. 
+
+Answer:
+
+Somewhat - I remember file I/O from CS11 but will need to review, especially 
+outputting to different files and handling multiple input sources.
+I will need to read string (for station names and commands) and int (for station
+numbers in passenger commands). I'll use std::ifstream for reading files, 
+std::ofstream for writing to the output file, std::getline() for reading full 
+lines with spaces, the >> operator for tokens, and std::cin for user input when 
+no command file is provided.
+
+2. What happens when I move the train (with 'm m') when the train is at the
+last provided station? 
+
+Answer: The train's next station should be the first provided station; the 
+train should wrap back around. 
+
+3. What classes will you need in your program? What interfaces (i.e. 
+functions) do they each provide? 
+
+Answer: 
+
+Classes I will need that are required by the spec (and their functions):
+1. Passenger class (just functions mentioned in spec)
+2. PassengerQueue class (just functions mentioned in spec)
+3. MetroSim class (will handle initialization from files, process commands, 
+manage the simulation state with a vector of stations, vector of PassengerQueues
+for the train, and an integer index for current station location)
+
+Classes I will need that aren't required by the spec:
+1. Stations class (has a string name, and a passenger queue of passengers 
+waiting to be picked up)
+
+4. How will you implement add a passenger to a station? How will this 
+impact the data structure(s) you use to represent the stations in the 
+simulation? 
+
+Answer: My station class will hold a passengerqueue member, which would be 
+private. However, I'd have functions to kind of wrap the dequeue and enqueue 
+functions from passengerqueue but for station. Station would also have functions
+to get the name and set the name. 
+
+5. How will you implement moving a train from one station into the next? 
+How will you put passengers onto the train? How will you take off the
+correct passengers who are leaving at the next station? How will these 
+considerations impact the data structure(s) you use to represent the 
+train in the simulation? 
+
+Answer: 
+
+I would have some index (in metrosim class) that keeps track of which station 
+the train is currently at, the index would only increment after the command 
+"m m".
+
+I would have a function in my stations class called pickUp (or something like 
+that), which would take in the index of where the train is currently at. Within 
+the pickUp function, I'd iterate through the waiting passengers, and and add 
+them to the passengerqueue in the train that corresponds to their destination 
+station (via the enqueue function from passengerqueue).
+
+After every "m m" command, every passenger on the passenger queue that 
+corresponds to arriving at the current station will be dequeued. 
+
+So each call of m m triggers: passengers at station (that we're about to move 
+away from) get on, current station index increments, then passengers get off the
+train (at the new station we've just arrived at).
+
+
+6. Does command behavior change based on the source of commands? 
+Based on your answer, how could we modularize our command processing
+code? Be as detailed as you can.
+
+Answer:
+Command behavior does not change based on the source --the same commands ('p', 
+'m m', 'm f') work identically whether from a file or stdin. To modularize, I'll
+create a command processing function that takes an std::istream& reference as a 
+parameter. Then I can pass either an std::ifstream (for file input) or std::cin 
+(for user input) to this function, allowing the same code to handle both cases 
+without duplication.
+
+7. How do you plan to test your program? What evidence of testing do
+you plan to submit? 
+
+Answer: 
+
+For Phase 1, I'll write unit tests in unit_tests.h to test Passenger and 
+PassengerQueue functions (enqueue, dequeue, front, size, print) and edge cases 
+like empty queues. For the full MetroSim, I'll create custom command and station
+files to test different scenarios (train wrapping, multiple passengers, 
+boarding/exiting) and use the diff command to compare my output with 
+the_MetroSim. I'll submit my unit_tests.h and any custom test input files I 
+create.
+
+I'll also attend the shell scripting tutorial, and hopefully that'll help make 
+testing easier.
+
+8. What is your timeline for completing this project? What would you like 
+to have completed, and by which dates?   
+
+Answer: 
+
+Days 1-2: Complete design checkoff and review file I/O. Days 3-4: Implement and 
+test Passenger and PassengerQueue for Phase 1 (due end of week 1). Days 5-7: 
+Implement Station and MetroSim classes with train movement logic. Days 8-9: Add 
+command processing and file I/O handling. Days 10-12: testing with diff, 
+debugging, and README writing. Day 13: Final submission.

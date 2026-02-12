@@ -1,0 +1,262 @@
+/*******************************************************************************
+* CS 15: HW 2 Cheshire ConCATenation
+* README
+* Author: Charlotte Wong (cwong22)
+* Date: 01/27/2026
+*******************************************************************************/
+
+Program Purpose:
+---------------
+
+    This program's purpose is to implement a character linked list that enables
+    flexibility during and after the creation of a linked list of characters. 
+    Empty, one character, and multiple character linked lists can be initially
+    created. Additionally, after the creation of the linked list more characters
+    can be added, removed, replaced, or concatenated. Unexpected uses of the
+    class are handled through errors that prevent undesired behavior.
+
+Acknowledgments:
+---------------
+
+TA(s):
+
+    Yoda Ermias
+    John Cha
+    Andrew Bacigalupi
+
+Professor Magnano
+
+Files:
+-----
+
+CharLinkedList.cpp: implementation of CharLinkedList class
+CharLinkedList.h: interface of CharLinkedList class
+Makefile: file to build program
+README: this file
+unit_test.h: unit tests for testing small blocks of code or methods
+
+Compile/run:
+-----------
+
+    Running the command "unit_test" in terminal will run every unit test, which 
+    contains void functions that act as independent "main" functions. Additional
+    void type unit functions can be created and will run with the "unit_test" 
+    command.
+
+    If we want to run one test alone, the command "unit_test -n name_of_test" 
+    will run that specified test (replace name_of_test with the name of the unit
+    test)!
+
+Data Structures and Algorithms:
+------------------------------
+
+    The primary abstract data type (ADT) used in this program is a list. A list
+    is an ordered collection of elements that supports insertion, removal, and
+    access at arbitrary valid positions. "Ordered" means that each element has a
+    well-defined position (first, second, etc.), but the list is not necessarily
+    sorted. The CharLinkedList class provides an implementation of this list ADT
+    for characters.
+
+    The list ADT is implemented using a doubly linked list data structure. 
+    Specifically, the CharLinkedList stores characters in a sequence of 
+    heap-allocated nodes, where each node contains a character value, a pointer
+    to the next node, and a pointer to the previous node. The class maintains
+    pointers to the front and back of the list, along with a variable tracking
+    the current number of elements (size). This choice enables constant-time
+    insertion and removal at both ends of the list, which is a significant
+    advantage over array-based implementations for operations like pushAtFront()
+    and popFromFront().
+
+    Doubly linked lists were a required data structure for this assignment, but
+    they are also an appropriate choice given the operations supported by
+    CharLinkedList. Inserting or removing elements at the front or back of the
+    list requires only pointer manipulation and takes constant time regardless
+    of list size. The bidirectional links allow efficient traversal in both
+    directions, which is particularly useful for operations like 
+    toReverseString() and for optimizing access to elements closer to the back
+    of the list.
+
+    However, doubly linked lists also introduce important tradeoffs. Because
+    elements aren't stored contiguously in memory, accessing an element at a
+    specific index requires traversing the list node-by-node from either the
+    front or back, resulting in linear-time access. Additionally, each node
+    requires extra memory for two pointers (next and previous), increasing the
+    overall space overhead compared to array lists. Cache performance may also
+    suffer due to non-contiguous memory allocation.
+
+    Doubly linked lists would be well-suited for implementing a text editor's
+    undo/redo functionality, where operations are frequently added and removed
+    from both ends of a history list. They would also be ideal for implementing
+    a music playlist where songs are constantly added, removed, and reordered,
+    since these operations don't require random access by index.
+
+    Several key algorithms were implemented to support the required operations.
+    The concatenate() function creates a deep copy of the second list and
+    appends it to the current list by connecting the back node's next pointer
+    to the copied list's front. This required careful pointer manipulation to
+    handle edge cases like empty lists and self-concatenation. The destructor
+    uses a private recursive helper function to deallocate all nodes, traversing
+    from front to back and deleting each node after recursively processing the
+    rest of the list. This approach handles lists of any size while avoiding 
+    memory leaks. The elementAt() and replaceAt() functions also use
+    recursive helper functions as required by the specification, demonstrating
+    how recursion can replace iterative traversal in linked structures.
+
+Testing:
+-------
+
+    The methods found in this class were testing through the unit_tests system,
+    where after (or even while) a method was written, a small unit test was
+    written & run to ensure expected behavior ensued. The order in which the 
+    functions are written in CharLinkedList.cpp is the approximate order in 
+    which the tests were written and run in. 
+
+    In unit_tests.h, it was essential to copy and paste statements to be printed
+    in order to properly verify whether I was printing the correct messages, and
+    comparing against truly correct output, and not comparing against my own 
+    incorrect typos. Through assert statements, I was able to catch several bugs
+    with my error messages regarding extra spaces, punctuation and parentheses.
+
+    It was also helpful to refer to the autograder results from HW1 to test for 
+    edge cases that I missed there, and likely also missed in my implementation 
+    for the linked lists version. Specifically, the insertInOrder from my 
+    character array lists implementation failed a test from the first homework,
+    I attempted to replicate a similar test in my unit tests, which my original 
+    insertInOrder in linked lists failed. I debugged my code, and was able to 
+    catch this edge case, where assuming the list would already be ordered was
+    causing unexpected behavior. 
+
+Time Spent: ~10 hours
+----------
+
+Questions:
+---------
+
+1. There are three categories of operations listed (insertion, removal, and 
+access). Within each category, list the times each operation took and rank the 
+operations from fastest to slowest.
+
+From the data displayed below, operations ranked from fastest to slowest are:
+Access Operation: last() < first() < elementAt()
+Removal Operation: popFromBack() < popFromFront() < removeAt()
+Insertion Operation: pushAtBack() < pushAtFront() < insertAt() 
+
+----------------------------------------------------------------------
+INSERTION OPERATION                                 Time (nanoseconds)
+----------------------------------------------------------------------
+pushAtFront 100 times                               3343
+----------------------------------------------------------------------
+pushAtBack 100 times                                1932
+----------------------------------------------------------------------
+insertAt middle of list 100 times                   1313200
+----------------------------------------------------------------------
+REMOVAL OPERATION                                   Time (nanoseconds)
+----------------------------------------------------------------------
+popFromFront 100 times                              1871
+----------------------------------------------------------------------
+popFromBack 100 times                               1870
+----------------------------------------------------------------------
+removeAt middle of list 100 times                   4345630
+----------------------------------------------------------------------
+ACCESS OPERATION                                    Time (nanoseconds)
+----------------------------------------------------------------------
+call first() 100 times                              507
+----------------------------------------------------------------------
+call last() 100 times                               472
+----------------------------------------------------------------------
+call elementAt() for middle of list 100 times       3031295
+----------------------------------------------------------------------
+
+
+2. Discuss these rankings. Why were certain operations so much faster or slower 
+than others? What are the features of linked lists that cause these disparities?
+
+Within each category of operation (insertion, removal, and access), the methods
+that require some manipulation of Nodes located at either extremity (front or
+back) of the linked list had drastically faster runtimes compared to methods 
+where alteration of nodes located somewhere in the middle of the list was 
+required.
+
+The reason for this disparity is due to the nature of linked lists, where there
+is no direct indexing. A node located in the middle of a list is only accessible
+through a pointer that points to it, which is either front, or the "next" 
+pointer from the Node directly before it, which can only be accessed in the same
+way. For nodes in the middle, traversing along several "next" or "previous" 
+pointers is costly in terms of time, which causes any methods which require 
+access to Nodes in the middle of lists. 
+
+In constrast, functions that dealt with Nodes near the front or back had much
+faster runtimes. The difference between the front and back operations for each 
+operation is nearly negligible --indicating that regardless of orientation, 
+operating near the extremities of a linked list is faster. This is due to the
+nature of having a doubly linked list, with front and back pointers. Front and
+back pointers allow nearly immediate access to the front and back Nodes of a 
+list, eliminating the time cost of traversing through several nodes to reach the
+Node of interest. 
+
+3. Now compare these measurements with the measurements you took for HW1. Which 
+operations are faster when using array lists? Which are faster using linked 
+lists? Why?
+
+In comparison to HW1, a notable difference in runtime is due to the lack of
+shifting necessity in linked lists. The contiguous storage of elements in array
+lists means inserting or removing elements near the front, requires all 
+subsequent elements to be shifted accordingly --which takes substantial time, as
+every affected element must be shifted. Linked lists require no shifting, as
+data is not stored contiguously. Non-contiguous data storage allows nodes to be
+removed and added without shifting, only needing relevant nodes to be altered,
+which is much faster.
+
+Another significant discrepancy between HW1 and HW2 measurements is in accessing
+elements. In array lists, accessing elements is quick, due to the capability of
+direct indexing in array lists. Simply indicating the location at which an 
+element is located within an array list permits access to it --whereas with
+linked lists, direct acessing is impossible; access to elements located in the 
+middle requires iterating/traversing through previous/subsequent nodes (since
+we have that choice with a doubly linked list). Traversing through these nodes
+takes much longer than directly accessing an element. 
+
+Additional Questions:
+--------------------
+
+• Q1: Which functions in the interface were easier to implement for linked lists
+compared to array lists? Why?
+
+For linked lists, it was easier to implement insertion and removal functions, as
+no shifting of affected elements was required. As long as the surrounding 
+pointers were adjusted, the link list would be in proper order. The non 
+contiguous storage of nodes in linked lists allowed easier insertion and removal
+of nodes. 
+
+• Q2: Which functions in the interface were harder to implement for linked lists
+compared to array lists? Why?
+
+Functions that required recursive logic were harder to implement for linked 
+lists, due to the necessity of recursive faith and intuition required to 
+generate these functions. Specifically, the toString and toReverseString were
+difficult due to the necessity to recurse through a list in either order, as 
+well as using a pointer for the string to be addended to, to prevent the default
+pass by value. 
+
+Additionally, implementing the destructor was more difficult for linked lists 
+compared to array lists --as deleting a heap allocated array can be done in one
+line, whereas linked lists require each node to be freed. Deleting nodes 
+requires access to each node, meaning recursing through the linked list is once
+again necessary. While following recursing through the pointers to traverse the
+list, it is also necessary to delete each node that is accessed --which must 
+occur in the opposite order of the recursion, in order not to lose access to 
+subsequent elements. 
+
+• Q3: If a client had an existing program that uses CharArrayLists, what changes
+would they have to make to their code to switch to CharLinkedLists?
+
+The client would have to include different header files depending on which 
+version of the list ADT they wanted to use. Using #include "CharArrayList.h" 
+would permit usage of the array lists data structure implementation, while using
+#include "CharLinkedList.h" would use the linked lists implementation. 
+Additionally, the client would have to declare any desired lists as their 
+respective class name (ex: CharArrayList list; or CharLinkedList list;). Thus,
+if a client wanted to use CharLinkedLists instead of CharArrayLists, they'd have
+to include a different header file, and replace declarations with the correct
+class name. 
+
