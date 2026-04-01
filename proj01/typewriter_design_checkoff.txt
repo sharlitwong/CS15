@@ -1,0 +1,252 @@
+Name: Charlotte Wong
+utln: cwong22  
+
+Answer the questions below, and submit your answers under the
+assignment "typewriter Design Checkoff" on Gradescope.  You must
+sign up for a design checkoff slot with a TA to discuss your provided
+answers (see spec for link).
+
+1. Run the reference implementation using the following command:
+`./the_typewriter pingpong.text logfile.text`
+./
+Once it is running, do the following:
+        a) Type "ping"
+        b) Press return
+        c) Type "pong"
+        d) Press backspace 5 times
+        e) Press escape
+        f) Type "x"
+        g) Type "y"
+        h) Press "return"
+
+After doing this, what are the contents of pingpong.text? What about
+logfile.text? Paste both below, and *briefly* describe the contents
+of logfile.text; what information is logged?
+
+Answer:
+
+pingpong.text contained the last state of the file I was editing before exiting
+the editor, in this case it was just one line containing the word "ping".
+
+logfile.text contained a snapshot of every edit I made while modifying using the
+editor, including the zero-indexed location of my cursor, as well as the 
+contents of my file. The contents of logfile.text followed the format:
+: Cursor Position: [x, y]
+*file contents*
+
+2. Now run the keylogger that was provided with the starter files
+(i.e., `./keylogger`). When prompted for a filename, enter
+"test.input". Then carry out the exact steps (a)-(h) as stated in
+the previous question, except swap steps (a) and (c). Conclude the
+keylogger by pressing "escape" two times. You should now have a
+file named "test.input". 
+
+Without editing/removing either of the files created in the previous
+question, run the reference implementation again, this time sending
+it the test input file you just created:
+`./the_typewriter pingpong.text logfile.text < test.input`
+
+What are the contents of pingpong.text now? Explain why those are the
+contents. If you see anything other than "pongping", try creating the
+file test.input again.
+
+Answer:
+
+The contents of pingpong.text are now "pongping".
+
+3. What public functions from the TextUI class do you think you will
+need to use? Which TextUI function is used to actually display
+information on the user's terminal screen? Describe the arguments to
+that function.
+
+Answer:
+Functions I will need to use and why:
+TextUI();
+   I would need to use the constructor to instantiate a TextUI object, any time
+   a user wants to use the type writer program (maybe in my Editor class).
+void startLogMode(std::string logfile);
+   I would use this whenever a user provides a second file argument, to enable
+   log mode. 
+void render(const std::vector<std::string> &lines, const int &cursorCol, const int &cursorLine);
+   I would call this after any user input requires an update to the display of 
+   the editor. This is the function that is used to actually display information
+   on the user's terminal screen. The arguments are:
+      1. const std::vector<std::string> &lines
+         This reference to a vector of strings indicates the contents of the 
+         file, where each string element is a line. 
+      2. const int &cursorCol
+         This integer indicates the cursor's horizontal position, like its x
+         coordinate.
+      3. const int &cursorLine
+         This integer indicates the cursor's vertical position, like its y 
+         coordinate (aka which line its on).
+int getChar();
+   I need to use this function each time the user inputs something (pressed a 
+   key), to process it and adjust the display accordingly.
+void close();
+   I'd call this anytime the user presses the key that indicates they want to 
+   close the editor. 
+int getTerminalWidth();
+   I would need to use this to check whether the length of the line the user is 
+   editing has exceeded this length and needs to overflow onto the next line. 
+int getTerminalHeight();
+   I might not need to use this, since scrolling would elimate constraints based
+   on terminal height.
+void displaySaveMessage();
+   This method would be called any time the user presses the key that indicates
+   saving the file they're editing. 
+bool savePrompt();
+   I would need to call this after the user presses "esc" then "x" in order
+   to record their response as to whether they want to save the program or not. 
+
+
+4. Consider implementing the handling of the input "backspace." What
+are the different cases your implementation must consider? What
+should your implementation do in each case; specifically, how are the
+inputs to TextUI's render() function altered? You should play around
+with the reference implementation when coming up with your answers.
+
+Answer:
+
+Different cases I'm considering for the input "backspace" include:
+1. The cursor is located at column 0, line 0; there is nothing to be deleted.
+   Cursor's location after delete is pressed: same as where it was originally,
+   column 0 & row 0.
+2. The cursor is located at column 0, but not row 0. In this case, the line
+   immediately after the cursor would no longer be a "new line" after the user
+   pressed delete, and would follow after the last character in the preceding 
+   line. 
+   Cursor's location after delete is pressed: the row should decrease by 1, and
+   the column should be the length of the original previous line (before merge)
+   modded by the terminal width.
+3. Cursor is anywhere other than the other two cases. In this case, the 
+   character immediately preceding the cursor's current location should be 
+   deleted. 
+   Cursor's location after delete is pressed: the cursor row should remain the 
+   same while the column should decrease by 1.
+
+5. How many ActionStack instances will your program use? When are the
+different times an Action should be pushed on to one of these
+ActionStacks? What information does each Action store?
+
+Answer:
+I need to instantiate two ActionStack objects: an undo stack, and a redo stack.
+
+Undo Stack:
+Actions will be pushed to this stack when the user does anything to alter their
+file (i.e. typing anything or pressing redo).
+
+Redo Stack:
+Actions that are undone will be pushed to this stack, as they're the only 
+actions that could possibly be redone. This stack will be cleared anytime the 
+alters the text excluding via the undo function, as redoing is not possible if 
+nothing was undone. 
+
+6. Use the reference implementation to play extensively with the
+"undo" feature (in typewriter: "escape" then "u"). Try undoing with
+many different inputs (printable characters, backspaces, newlines,
+etc.) and different combinations of these inputs. Make sure to try
+pressing undo multiple times in a row.
+
+What are the rules determining how many characters should be undone
+each time "undo" is entered? Express your answer using pseudocode. We
+encourage you to write your pseudocode using an ActionStack---this
+will more closely match the code you eventually write!
+
+Answer:
+It seems like the entire "line" is deleted when the "undo" command is used. 
+
+7. Now use the reference to play with "redo" functionality (in
+typewriter: "escape" then "r") after undoing actions. Write
+pseudocode below capturing the rules for how many characters should
+be "redone" each time "redo" is pressed.
+
+Answer:
+
+It seems like the entire thing that was undone (which must've been a line) gets
+"redone" when redo is pressed. 
+
+8. Consider implementing the "up" arrow key functionality.
+
+   (a) What functions from the TextUI class will you need to use to
+       implement "up"?
+
+Answer:
+      I would need render() and and getTerminalWidth(). Render would give me the
+      current state of the file, including where the cursor is, and all the  
+      existing lines. Then, getTerminalWidth would allow me to tell whether any
+      given line wraps or not.
+
+   (b) What are the different cases you need to consider for "up"?
+       In particular, consider: different lengths of the current line
+       (including lines that are long enough to wrap around), where
+       the cursor is located, and different lengths for the line prior
+       to the current line.
+
+Answer:
+
+       Case 1: the cursor is on the first logical line, which has yet to wrap 
+       around. In this case, nothing should be done, as the cursor cannot move
+       further up. 
+       Case 2: the cursor is in some logical line, which is long enough to wrap 
+       to the next line. The cursor should move up one visual line, but 
+       remain within the same logical line. 
+       Case 3: the cursor is in a line that doesn't wrap, and there exists some
+       line above which doesn't extend as far horizontally as the cursor's 
+       current location. The cursor should move up one logical line, to the end
+       of the previous logical line.
+       Case 4: the cursor is in some line, that has yet to wrap, an there exists
+       some line above it that extends horizontally past where the cursor is 
+       currently located. In this case, the cursor should move up one logical 
+       line and remain in its original column.
+
+   (c) Provide pseudocode for the handling of the "up" arrow.
+
+   t_Width = getTerminalWidth()
+   colInVisualLine = cursorCol % termWidth
+   visualLineOfCursor = cursorCol / termWidth
+
+   if cursorLine == 0 and visualLineOfCursor == 0:
+      do nothing  //case 1
+
+   else if visualLineOfCursor > 0:
+      //case 2: wrap within same logical line
+      cursorCol -= termWidth
+
+   else:
+      //cases 3 and 4: move to previous logical line
+      cursorLine -= 1
+      prevLineLen = lines[cursorLine].length()
+      lastVisualLineStart = (prevLineLen / termWidth) * termWidth
+      newCol = lastVisualLineStart + colInVisualLine
+      if newCol > prevLineLen:
+         newCol = prevLineLen  //case 3: line too short
+      cursorCol = newCol        //case 4: line long enough
+
+
+Answer:
+
+
+   (d) Now, provide psuedocode for the handling of the "down" arrow.
+
+Answer:
+
+
+9. What classes will you need in your program?  What are the important
+functions and member variables that those classes will comprise? How
+will the classes interact (i.e., which classes will be clients of
+others)?
+
+Answer:
+
+
+10. How do you plan to test your program? What evidence of testing do
+you plan to submit?
+
+Answer:
+
+
+11. What is your timeline for completing this project? What would you
+like to have completed, and by which dates?  
+
+Answer: 

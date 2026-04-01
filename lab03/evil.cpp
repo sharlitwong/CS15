@@ -19,8 +19,7 @@ using namespace std;
  *              char *argv[] - list of command line arguments
  * Returns:     int 0        - representing the successful exit of the program
  */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
         if (argc < 2) {
                 cout << "Usage:  ./evil [filename]" << endl;
                 return 1;

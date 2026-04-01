@@ -1,0 +1,219 @@
+/**********************************************************
+* Project 2: Zap
+* CS 15
+* README
+* Author: Charlotte Wong (cwong22)
+* Date: March 20, 2026
+* Github repository: 
+  https://github.com/Tufts-CS15/proj-zap-sharlitwong.git
+*********************************************************/
+
+Program Purpose:
+---------------
+
+    This program implements file compression and decompression using
+    Huffman coding. The encoder reads an ASCII text file, computes
+    character frequencies, builds a Huffman tree, and writes a compressed
+    binary file (.zap). The decoder reads a .zap file, reconstructs the
+    Huffman tree, and restores the original text file exactly.
+
+    The program supports two commands:
+        - zap:   compress a text file into a .zap file
+        - unzap: decompress a .zap file back into text
+
+Acknowledgments:
+---------------
+
+    Professor Magnano: introduction to priority queues, huffman tree/coding
+
+    Rereading files through seekg:
+    https://cplusplus.com/reference/istream/istream/seekg/: 
+
+    Auto keyword:
+    https://www.w3schools.com/cpp/cpp_auto.asp
+    https://www.geeksforgeeks.org/cpp/type-inference-in-c-auto-and-decltype/ 
+
+Files:
+-----
+
+.gitignore: Specifies files to be excluded from Git tracking, including
+            compiled outputs, generated .zap files, and starter/reference
+            files.
+
+HuffmanCoder.h: Interface for the HuffmanCoder class. Declares the public
+                encoder and decoder methods along with private helpers for
+                tree construction, serialization, and bit I/O.
+
+HuffmanCoder.cpp: Implementation of the HuffmanCoder class. Handles
+                  frequency counting, priority-queue-based tree construction,
+                  tree serialization and deserialization, binary encoding, and
+                  decoding. Also handles edge cases including empty files and
+                  single-character inputs.
+
+main.cpp: Driver program that parses command-line arguments and dispatches
+          to the encoder or decoder. Reports errors for invalid usage.
+
+Makefile: Builds the zap executable and the unit test binary.
+
+README: This documentation file.
+
+unit_tests.h: Unit tests for HuffmanCoder functionality using the unit_test
+              framework. Covers encoder behavior on valid input, empty file
+              handling, nonexistent file errors, the single-character edge
+              case, and full encode-decode roundtrip correctness.
+
+test.sh: Shell script that runs comprehensive diff-based tests, comparing
+         program output against the reference implementation (the_zap).
+         Tests include invalid arguments, nonexistent files, empty files,
+         roundtrip correctness, cross-compatibility with the reference
+         encoder/decoder, large file handling, and malformed .zap detection.
+
+empty.txt: Sample input file containing no characters, used to test that
+           the encoder exits gracefully with the correct message instead
+           of producing an empty or malformed .zap file.
+
+test_input.txt: Sample input file used in encoder and decoder unit tests
+                to verify correct compression and decompression on typical
+                ASCII content.
+
+test_empty.txt: Intentionally empty file used to test the empty file edge
+                case in isolation.
+
+test_single.txt: File containing a single repeated character, used to test
+                 the single-character edge case in which a dummy node must
+                 be added to produce a valid Huffman tree.
+
+roundtrip_in.txt: Input file used to verify that encoding followed by
+                  decoding produces output identical to the original.
+
+Compile/run:
+-----------
+
+    To compile:
+        make zap
+
+    To run:
+        ./zap zap <input.txt> <output.zap>
+        ./zap unzap <input.zap> <output.txt>
+
+    To run unit tests:
+        make unit_test
+        ./a.out
+
+    To run diff tests:
+        bash test.sh
+
+Data Structures and Algorithms:
+------------------------------
+
+    This program uses a Huffman tree to perform lossless compression. Each
+    leaf node represents a unique character, and the path from the root to
+    that leaf (left for '0', right for '1') defines its binary encoding.
+    Characters that appear more frequently receive shorter codes, which is
+    what produces compression.
+
+    A priority queue (min-heap) compared by frequency is used to construct the
+    Huffman tree. Each node stores a character and its frequency. The algorithm 
+    repeatedly extracts the two lowest-frequency nodes from the queue and merges
+    them into a new parent node whose frequency is their sum. This continues 
+    until a single root node remains. A priority queue was chosen because it 
+    efficiently provides the minimum-frequency node at each step in O(log n) 
+    time, which is essential to the correctness of Huffman's algorithm.
+
+    A map<char, int> stores each character's frequency during the first phase of
+    encoding. This map is used to construct a Huffman tree, which is then used
+    to construct second map: map<char, string> stores the resulting binary 
+    encoding for each character. Both maps provide O(log n) lookup, which is
+    acceptable given the small alphabet size (at most 256 ASCII characters).
+
+    Tree serialization occurs through a preorder traversal:
+        - 'I' marks an internal node
+        - 'L' marks a leaf, immediately followed by its character
+    This compact representation is written to the .zap file before the encoded 
+    bits so the decoder can reconstruct the exact same tree without re-analyzing
+    the input. Deserialization reconstructs the tree recursively from
+    this string.
+
+    Encoding reads the input file character by character and replaces each
+    with its binary code from the encoding map, writing bits to the output
+    file. Decoding traverses the reconstructed tree bit by bit --going left
+    on '0' and right on '1', emitting a character each time a leaf is
+    reached.
+
+    Key edge cases handled:
+        - Empty input file: the encoder exits with an informative message
+          rather than producing an empty or malformed .zap file.
+        - Single unique character: because a tree with one node has no
+          edges and therefore no codes, a dummy node is added as a sibling
+          so the single character receives the code '0'.
+        - Invalid encoded bit sequence: if the bit stream does not lead to
+          a valid leaf, a runtime_error is thrown rather than producing
+          corrupted output.
+
+Testing:
+------- 
+
+    Testing was performed using both unit tests and diff-based testing. 
+
+    Unit testing (unit_tests.h) verifies individual components. Unit tests were
+    first written for phase one functions, without being tied to a class. Once
+    those functions were implemented in the HuffmanCoder class, those original
+    tests were commented out and rewritten to conform with the newly created 
+    class. Finally, when the functions were made private, the recreated tests
+    were commented out, only leaving ones that test the public functions 
+    (encoder and decoder).
+
+    Encoder and decoder tests:
+
+        - encoder on valid input: confirms that encoding a known file
+          produces a non-empty .zap file without throwing errors.
+        - empty file handling: verifies that attempting to encode an empty
+          file exits gracefully with the correct message rather than
+          crashing or writing malformed output.
+        - nonexistent file error: confirms that passing a filename that
+          does not exist produces the appropriate error and does not crash.
+        - single-character edge case: verifies that a file containing only
+          one unique character is encoded and decoded correctly using the
+          dummy-node workaround.
+        - roundtrip correctness: encodes a file, then decodes the result,
+          and verifies the decoded output is byte-for-byte identical to the
+          original input, confirming that no data is lost or corrupted.
+
+    Diff testing (test.sh) compares program output against the reference
+    implementation (the_zap). Tests include:
+
+        - invalid argument handling: verifies that wrong argument counts or
+          unknown commands produce the correct usage error message.
+        - nonexistent file errors: confirms that error output matches the
+          reference when a specified input file does not exist.
+        - empty file behavior: verifies that the empty-file message matches
+          the reference exactly, both on stdout and exit behavior.
+        - roundtrip encoding/decoding: encodes several files with my
+          encoder then decodes with my decoder, diffing against the
+          original to verify lossless reconstruction.
+        - stdout matching reference: confirms that informational output
+          (e.g., compression ratio messages) matches the reference.
+        - cross-compatibility: encodes with my encoder and decodes with
+          the reference decoder (and vice versa) to confirm the binary
+          format is correctly implemented.
+        - large file (Shakespeare): runs the full roundtrip on a large
+          real-world input to verify correctness at scale and catch any
+          issues not apparent on small test files.
+        - invalid .zap file detection: confirms that passing a malformed
+          or truncated .zap file to the decoder produces a runtime_error
+          consistent with the reference.
+
+    Files used for testing are not tracked in the repository and therefore
+    not submitted.
+
+    Edge cases considered:
+        - encoding empty files
+        - decoding malformed or truncated input
+        - files containing only one unique character
+        - large input files with varied character distributions
+        - argument validation (wrong count, unknown command)
+
+Time Spent:
+----------
+
+    ~15 hours
