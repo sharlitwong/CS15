@@ -3,24 +3,10 @@
 #########################################################
 # Charlotte Wong (cwong22)
 
-##
-## Add your compiler, compiler flags variables here (e.g. CXX, CXXFLAGS).
-## Use previous Makefiles as examples!
-##
-## At the end, you can delete this comment!
-##
 CXX      = clang++
 CXXFLAGS = -g3 -Wall -Wextra -Wpedantic -Wshadow
 LDFLAGS  = -g3
 #LDFLAGS  = -g3 -lncurses
-
-## 
-## Add your compilation and linking rules here! You can use previous 
-## Makefiles as examples, and you can refer to the "make" documentation
-## on the course reference page. Note, you do NOT need rules for
-## HuffmanTreeNode.o and ZapUtil.o as those (pre-compiled) 
-## object files are provided to you.
-##
 
 #zap rule, makes the executable
 zap: main.o HuffmanCoder.o HuffmanTreeNode.o ZapUtil.o
@@ -57,20 +43,6 @@ phaseOne.o: phaseOne.cpp phaseOne.h
 # The below rule will be used by unit_test.
 unit_test: unit_test_driver.o HuffmanCoder.o HuffmanTreeNode.o ZapUtil.o
 	$(CXX) $(CXXFLAGS) $^
-
-## To start, we recommend you add rules to make executables from
-## minpq_example.cpp and ZapUtilExample.cpp. First, you should compile
-## these into their respective object files. Look in these files to
-## identify the appropriate headers. For the minpq_example executable 
-## you should link minpq_example.o and HuffmanTreeNode.o. For the
-## ZapUtilExample executable you should link ZapUtilExample.o,
-## ZapUtil.o, and HuffmanTreeNode.o. 
-## 
-## After that, you should go ahead and make the necessary rules to
-## produce the zap executable. 
-## 
-## At the end, you can delete this comment block! 
-## 
 
 ##
 ## Here is a special rule that removes all .o files besides the provided ones 

@@ -59,7 +59,7 @@ echo "=== TEST 7: banana.txt roundtrip ==="
 if diff banana.txt banana_out.txt > /dev/null; then
     echo "PASSED"
 else
-    echo "FAILED - roundtrip mismatch"
+    echo "FAILED, roundtrip mismatch"
 fi
 
 echo "=== TEST 8: stdout diff against reference (banana) ==="
@@ -68,7 +68,7 @@ echo "=== TEST 8: stdout diff against reference (banana) ==="
 if diff my_out.txt ref_out.txt > /dev/null; then
     echo "PASSED"
 else
-    echo "FAILED - stdout mismatch:"
+    echo "FAILED, stdout mismatch:"
     diff my_out.txt ref_out.txt
 fi
 
@@ -78,7 +78,7 @@ echo "=== TEST 9: cross-decode banana (my encoder, ref decoder) ==="
 if diff banana.txt banana_cross.txt > /dev/null; then
     echo "PASSED"
 else
-    echo "FAILED - cross-decode mismatch"
+    echo "FAILED, cross-decode mismatch"
 fi
 
 echo "=== TEST 10: sentences.txt roundtrip ==="
@@ -87,7 +87,7 @@ echo "=== TEST 10: sentences.txt roundtrip ==="
 if diff sentences.txt sentences_out.txt > /dev/null; then
     echo "PASSED"
 else
-    echo "FAILED - roundtrip mismatch"
+    echo "FAILED, roundtrip mismatch"
 fi
 
 echo "=== TEST 11: stdout diff against reference (sentences) ==="
@@ -96,7 +96,7 @@ echo "=== TEST 11: stdout diff against reference (sentences) ==="
 if diff my_out.txt ref_out.txt > /dev/null; then
     echo "PASSED"
 else
-    echo "FAILED - stdout mismatch:"
+    echo "FAILED, stdout mismatch:"
     diff my_out.txt ref_out.txt
 fi
 
@@ -106,7 +106,7 @@ echo "=== TEST 12: shakespeare roundtrip ==="
 if diff works_of_shakespeare.txt shakes_out.txt > /dev/null; then
     echo "PASSED"
 else
-    echo "FAILED - roundtrip mismatch"
+    echo "FAILED, roundtrip mismatch"
 fi
 
 echo "=== TEST 13: stdout diff against reference (shakespeare) ==="
@@ -115,7 +115,7 @@ echo "=== TEST 13: stdout diff against reference (shakespeare) ==="
 if diff my_out.txt ref_out.txt > /dev/null; then
     echo "PASSED"
 else
-    echo "FAILED - stdout mismatch:"
+    echo "FAILED, stdout mismatch:"
     diff my_out.txt ref_out.txt
 fi
 

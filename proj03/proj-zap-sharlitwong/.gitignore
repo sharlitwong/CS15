@@ -1,0 +1,84 @@
+# Zap-specific files
+the_zap
+bad_zap_file
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Linker files
+*.ilk
+
+# Debugger Files
+*.pdb
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# debug information files
+*.dwo
+
+#Ignore test output or temporary files
+*_out.txt
+my_out.txt
+roundtrip_out.txt
+shakes_out.txt
+sentences_out.txt
+
+#other
+*.d
+*.gch
+
+
+phaseOne.cpp
+README.md
+single_out.zap
+minpq_example.cpp
+sentences.txt
+sentences_ref.zap
+banana_apple.txt
+ecoli.coli
+phaseOne.h
+HuffmanTreeNode.h
+all_conll_english
+ZapUtil.h
+ZapUtilExample.cpp
+banana.txt
+banana.zap
+sentences.zap
+shakes.zap
+banana_ref.zap
+shakes_ref.zap
+zap
+zap_design_checkoff.txt
+banana_cross.txt
+roundtrip.zap
+hi.txt
+test_output.zap
+all_conll_english.txt
